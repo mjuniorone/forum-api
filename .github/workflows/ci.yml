@@ -12,9 +12,9 @@ jobs:
       postgres:
         image: postgres:12
       env:
-        POSTGRES_DB: ${{ secrets.PGDATABASE_TEST }}
-        POSTGRES_USER: ${{ secrets.PGUSER_TEST }}
-        POSTGRES_PASSWORD: ${{ secrets.PGPASSWORD_TEST }}
+        POSTGRES_DB: forumapi_test
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: supersecretpassword
         POSTGRES_PORT: 5432
         ports:
           - 5432:5432

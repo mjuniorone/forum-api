@@ -8,22 +8,19 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+
     services:
       postgres:
         image: postgres:12
+
       env:
-        PGUSER_TEST: ${{ secrets.PGUSER_TEST }}
-        PGDATABASE_TEST: ${{ secrets.PGDATABASE_TEST }}
-        PGPASSWORD_TEST: ${{ secrets.PGPASSWORD_TEST }}
-        PGPORT_TEST: 5432
-        PGUSER: ${{ secrets.PGUSER_TEST }}
-        PGDATABASE: ${{ secrets.PGDATABASE_TEST }}
-        PGPASSWORD: ${{ secrets.PGPASSWORD_TEST }}
-        PGPORT: 5432
-        ports:
-          - 5432:5432
-        options:
-          --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+        POSTGRES_PASSWORD: ${{ secrets.PGPASSWORD_TEST }}
+
+      ports:
+        - 5432:5432
+
+      options:
+        --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     strategy:
       matrix:
@@ -43,12 +40,12 @@ jobs:
         npm run test
       env:
         CI: true
-        PGHOST_TEST: 127.0.0.1
+        PGHOST_TEST: localhost
         PGUSER_TEST: ${{ secrets.PGUSER_TEST }}
         PGDATABASE_TEST: ${{ secrets.PGDATABASE_TEST }}
         PGPASSWORD_TEST: ${{ secrets.PGPASSWORD_TEST }}
         PGPORT_TEST: 5432
-        PGHOST: 127.0.0.1
+        PGHOST: localhost
         PGUSER: ${{ secrets.PGUSER_TEST }}
         PGDATABASE: ${{ secrets.PGDATABASE_TEST }}
         PGPASSWORD: ${{ secrets.PGPASSWORD_TEST }}

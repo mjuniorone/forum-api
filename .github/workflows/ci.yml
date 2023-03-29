@@ -9,13 +9,13 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    container: node:10.18-jessie
+
     services:
       postgres:
         image: postgres
 
       env:
-        POSTGRES_USER: ${{ secrets.PGUSER_TEST }}
-        POSTGRES_DB: ${{ secrets.PGDATABASE_TEST }}
         POSTGRES_PASSWORD: ${{ secrets.PGPASSWORD_TEST }}
 
       ports:
@@ -45,12 +45,15 @@ jobs:
         npm run test
       env:
         CI: true
-        PGHOST_TEST: localhost
+        POSTGRES_HOST: postgres
+        POSTGRES_PORT: 5432
+
+        PGHOST_TEST: postgres
         PGUSER_TEST: ${{ secrets.PGUSER_TEST }}
         PGDATABASE_TEST: ${{ secrets.PGDATABASE_TEST }}
         PGPASSWORD_TEST: ${{ secrets.PGPASSWORD_TEST }}
         PGPORT_TEST: 5432
-        PGHOST: localhost
+        PGHOST: postgres
         PGUSER: ${{ secrets.PGUSER_TEST }}
         PGDATABASE: ${{ secrets.PGDATABASE_TEST }}
         PGPASSWORD: ${{ secrets.PGPASSWORD_TEST }}

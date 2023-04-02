@@ -26,8 +26,14 @@ class CommentRepositoryPostgres extends CommentRepository {
 
   async getCommentsInThread(threadId) {
     const query = {
-      text: `SELECT comments.*, users.username FROM comments
-      INNER JOIN users ON users.id = comments.owner
+      text: `SELECT comments.*, users.username, COALESCE(all_like_counts.like_count, 0) AS like_count
+      FROM users INNER JOIN comments ON users.id = comments.owner
+      LEFT JOIN
+      (
+      SELECT comments.id, Count(comment_likes.comment_id) AS like_count
+      FROM comments INNER JOIN comment_likes ON comments.id = comment_likes.comment_id
+      GROUP BY comments.id
+      ) all_like_counts ON comments.id = all_like_counts.id
       WHERE comments.thread_id = $1
       ORDER BY comments.date ASC`,
       values: [threadId],
@@ -46,6 +52,37 @@ class CommentRepositoryPostgres extends CommentRepository {
     };
 
     await this._pool.query(query);
+  }
+
+  async likeComment(commentId, userId) {
+    const id = `like-${this._idGenerator()}`;
+
+    const query = {
+      text: 'INSERT INTO comment_likes VALUES($1, $2, $3)',
+      values: [id, userId, commentId],
+    };
+
+    await this._pool.query(query);
+  }
+
+  async unlikeComment(commentId, userId) {
+    const query = {
+      text: 'DELETE FROM comment_likes WHERE comment_id = $1 AND user_id = $2',
+      values: [commentId, userId],
+    };
+
+    await this._pool.query(query);
+  }
+
+  async checkCommentLike(commentId, userId) {
+    const query = {
+      text: 'SELECT * FROM comment_likes WHERE comment_id = $1 AND user_id = $2',
+      values: [commentId, userId],
+    };
+
+    const { rowCount } = await this._pool.query(query);
+
+    return !!rowCount;
   }
 
   async verifyCommentAvailability(commentId) {

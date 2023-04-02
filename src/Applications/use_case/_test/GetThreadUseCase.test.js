@@ -6,7 +6,6 @@ const ThreadRepository = require('../../../Domains/threads/ThreadRepository');
 const UserRepository = require('../../../Domains/users/UserRepository');
 const GetThreadUseCase = require('../GetThreadUseCase');
 const GetReply = require('../../../Domains/replies/entities/GetReply');
-// const GetReply = require('../../../Domains/replies/entities/GetReply');
 
 describe('GetThreadUseCase', () => {
   it('should orchestrate the get thread action correctly', async () => {
@@ -22,6 +21,7 @@ describe('GetThreadUseCase', () => {
         owner: 'user-888',
         is_delete: 'FALSE',
         username: 'SuperCat',
+        like_count: '1',
       },
       {
         id: 'comment-yksuCoxM2s4MMrZJO-qVD',
@@ -31,6 +31,7 @@ describe('GetThreadUseCase', () => {
         owner: 'user-123',
         is_delete: 'FALSE',
         username: 'dicoding',
+        like_count: '2',
       },
     ];
     const mockCommentIds = mockComments.map((comment) => comment.id);
@@ -86,6 +87,7 @@ describe('GetThreadUseCase', () => {
           date: '2021-08-08T07:22:33.555Z',
           content: 'hi',
           username: 'SuperCat',
+          likeCount: 1,
           replies: [
             new GetReply({
               id: 'reply-BErOXUSefjwWGW1Z10Ihk',
@@ -108,6 +110,7 @@ describe('GetThreadUseCase', () => {
           date: '2021-08-08T07:26:21.338Z',
           content: 'I have a cat too',
           username: 'dicoding',
+          likeCount: 2,
           replies: [
             new GetReply({
               id: 'reply-BErOXUSefjwWGW1Z10Ihk',
@@ -152,9 +155,6 @@ describe('GetThreadUseCase', () => {
 
     mockReplyRepository.getRepliesOfComments = jest.fn()
       .mockImplementation(() => Promise.resolve(mockReplies));
-
-    // mockUserRepository.getUsernameById = jest.fn()
-    //   .mockImplementation(() => Promise.resolve('SuperCat'));
 
     /* creating use case instance */
     const getThreadUseCase = new GetThreadUseCase({

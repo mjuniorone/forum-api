@@ -62,14 +62,14 @@ describe('CommentRepository postgres', () => {
       const comments = [
         {
           id: 'comment-888',
-          date: new Date().toISOString(),
+          date: '2023-04-02T04:07:49.935Z',
           content: 'hi',
           threadId,
           owner: 'user-888',
         },
         {
           id: 'comment-123',
-          date: new Date().toISOString(),
+          date: '2023-04-02T04:08:14.574Z',
           content: 'helo',
           threadId,
           owner: 'user-123',

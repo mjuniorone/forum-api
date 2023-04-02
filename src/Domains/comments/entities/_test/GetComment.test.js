@@ -19,6 +19,7 @@ describe('GetComment entities', () => {
       content: 'hi',
       username: true,
       is_delete: {},
+      like_count: [],
     };
 
     // Action and Assert
@@ -33,6 +34,7 @@ describe('GetComment entities', () => {
       content: 'hi',
       username: 'SuperCat',
       is_delete: 'FALSE',
+      like_count: 88,
     };
 
     // Action
@@ -44,6 +46,7 @@ describe('GetComment entities', () => {
     expect(addedComment.date).toEqual(payload.date);
     expect(addedComment.content).toEqual(payload.content);
     expect(addedComment.username).toEqual(payload.username);
+    expect(addedComment.likeCount).toEqual(payload.like_count);
   });
 
   it('should change content to **komentar telah dihapus** if is_delete is TRUE', () => {
@@ -54,6 +57,7 @@ describe('GetComment entities', () => {
       content: 'hi',
       username: 'user-888',
       is_delete: 'TRUE',
+      like_count: 88,
     };
 
     // Action
@@ -65,5 +69,6 @@ describe('GetComment entities', () => {
     expect(addedComment.date).toEqual(payload.date);
     expect(addedComment.content).toEqual('**komentar telah dihapus**');
     expect(addedComment.username).toEqual(payload.username);
+    expect(addedComment.likeCount).toEqual(payload.like_count);
   });
 });

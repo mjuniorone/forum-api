@@ -1,5 +1,6 @@
 const autoBind = require('auto-bind');
 const AddCommentUseCase = require('../../../../Applications/use_case/AddCommentUseCase');
+const UpdateCommentLikeUseCase = require('../../../../Applications/use_case/UpdateCommentLikeUseCase');
 const DeleteCommentUseCase = require('../../../../Applications/use_case/DeleteCommentUseCase');
 
 class CommentsHandler {
@@ -23,6 +24,17 @@ class CommentsHandler {
     });
     response.code(201);
     return response;
+  }
+
+  async putCommentLikeHandler(request) {
+    const { id: userId } = request.auth.credentials;
+    const { threadId, commentId } = request.params;
+    const updateCommentLikeUseCase = this._container.getInstance(UpdateCommentLikeUseCase.name);
+    await updateCommentLikeUseCase.execute(userId, threadId, commentId);
+
+    return {
+      status: 'success',
+    };
   }
 
   async deleteCommentHandler(request) {

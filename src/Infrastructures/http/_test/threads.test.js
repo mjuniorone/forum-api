@@ -76,17 +76,24 @@ describe('/threads endpoint', () => {
     it('should response 200 and get thread, comments, and replies', async () => {
       // Arrange
       const server = await createServer(container);
-      const { accessToken } = await ThreadsTableTestHelper.loginUser(server);
+
+      /* login users */
+      const { accessToken: firstToken } = await ThreadsTableTestHelper.loginUser(server);
+      const { accessToken: secondToken } = await ThreadsTableTestHelper.loginUser(server, {
+        username: 'SuperCat',
+        password: 'meow',
+        fullname: 'My Cat',
+      });
 
       /* add thread */
-      const thread = await ThreadsTableTestHelper.postThread(server, accessToken);
+      const thread = await ThreadsTableTestHelper.postThread(server, firstToken);
       const { id: threadId } = JSON.parse(thread.payload).data.addedThread;
 
       /* add comments */
-      const firstComment = await CommentsTableTesthelper.postComment(server, accessToken, threadId);
+      const firstComment = await CommentsTableTesthelper.postComment(server, firstToken, threadId);
       const secondComment = await CommentsTableTesthelper.postComment(
         server,
-        accessToken,
+        firstToken,
         threadId,
         {
           content: 'helo',
@@ -95,9 +102,18 @@ describe('/threads endpoint', () => {
       const { id: firstCommentId } = JSON.parse(firstComment.payload).data.addedComment;
       const { id: secondCommentId } = JSON.parse(secondComment.payload).data.addedComment;
 
+      /* like comments */
+      // like and unlike
+      await CommentsTableTesthelper.putCommentLike(server, secondToken, threadId, firstCommentId);
+      await CommentsTableTesthelper.putCommentLike(server, secondToken, threadId, firstCommentId);
+
+      await CommentsTableTesthelper.putCommentLike(server, secondToken, threadId, firstCommentId);
+      await CommentsTableTesthelper.putCommentLike(server, firstToken, threadId, secondCommentId);
+      await CommentsTableTesthelper.putCommentLike(server, secondToken, threadId, secondCommentId);
+
       /* add replies */
-      await RepliesTableTestHelper.postReply(server, accessToken, threadId, firstCommentId);
-      await RepliesTableTestHelper.postReply(server, accessToken, threadId, secondCommentId);
+      await RepliesTableTestHelper.postReply(server, firstToken, threadId, firstCommentId);
+      await RepliesTableTestHelper.postReply(server, secondToken, threadId, secondCommentId);
 
       // Action
       const response = await server.inject({
@@ -110,6 +126,11 @@ describe('/threads endpoint', () => {
       expect(response.statusCode).toEqual(200);
       expect(responseJson.status).toEqual('success');
       expect(responseJson.data.thread).toBeDefined();
+      expect(responseJson.data.thread.comments).toHaveLength(2);
+      expect(responseJson.data.thread.comments[0].replies).toHaveLength(1);
+      expect(responseJson.data.thread.comments[1].replies).toHaveLength(1);
+      expect(responseJson.data.thread.comments[0].likeCount).toBe(1);
+      expect(responseJson.data.thread.comments[1].likeCount).toBe(2);
     });
 
     it('should response 200 and get thread and deleted comment and deleted reply', async () => {
